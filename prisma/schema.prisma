@@ -1,0 +1,169 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  HOST
+  TOURIST
+}
+
+enum AccommodationType {
+  CABIN
+  HOTEL
+  APARTMENT
+  HOSTEL
+  CAMPING
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum AttractionCategory {
+  HILL
+  RIVER_BEACH
+  CULTURAL
+  NIGHT
+  NATURE_TRAIL
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  lastName  String
+  phone     String?
+  role      Role     @default(TOURIST)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accommodations    Accommodation[]
+  bookings          Booking[]
+  createdInvitations InvitationToken[]
+
+  @@map("users")
+}
+
+model InvitationToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  email     String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  @@map("invitation_tokens")
+}
+
+model Accommodation {
+  id            String            @id @default(uuid())
+  name          String
+  description   String            @db.Text
+  type          AccommodationType @default(CABIN)
+  address       String
+  locality      String            @default("Capilla del Monte")
+  latitude      Float?
+  longitude     Float?
+  pricePerNight Decimal           @db.Decimal(10, 2)
+  maxGuests     Int
+  amenities     String[]
+  isActive      Boolean           @default(true)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  hostId String
+  host   User   @relation(fields: [hostId], references: [id])
+
+  images   AccommodationImage[]
+  bookings Booking[]
+
+  @@map("accommodations")
+}
+
+model AccommodationImage {
+  id              String        @id @default(uuid())
+  url             String
+  publicId        String
+  isMain          Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+
+  accommodationId String
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id], onDelete: Cascade)
+
+  @@map("accommodation_images")
+}
+
+model Booking {
+  id            String        @id @default(uuid())
+  bookingCode   String        @unique
+  checkIn       DateTime      @db.Date
+  checkOut      DateTime      @db.Date
+  totalNights   Int
+  guestCount    Int
+  pricePerNight Decimal       @db.Decimal(10, 2)
+  totalAmount   Decimal       @db.Decimal(10, 2)
+  status        BookingStatus @default(PENDING)
+
+  guestName     String
+  guestEmail    String
+  guestPhone    String
+  guestOrigin   String?
+  notes         String?       @db.Text
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  accommodationId String
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+
+  touristId String?
+  tourist   User?   @relation(fields: [touristId], references: [id])
+
+  @@index([accommodationId, checkIn, checkOut])
+  @@map("bookings")
+}
+
+model Attraction {
+  id                String             @id @default(uuid())
+  name              String
+  description       String             @db.Text
+  category          AttractionCategory @default(HILL)
+  difficulty        String?            // Low, Medium, High
+  estimatedDuration String?            // e.g. "3 hours", "Full day"
+  howToGet          String?            @db.Text
+  requiresGuide     Boolean            @default(false)
+  admissionFee      Decimal?           @db.Decimal(10, 2)
+  latitude          Float?
+  longitude         Float?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  images AttractionImage[]
+
+  @@map("attractions")
+}
+
+model AttractionImage {
+  id           String     @id @default(uuid())
+  url          String
+  publicId     String
+  createdAt    DateTime   @default(now())
+
+  attractionId String
+  attraction   Attraction @relation(fields: [attractionId], references: [id], onDelete: Cascade)
+
+  @@map("attraction_images")
+}

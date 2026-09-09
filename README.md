@@ -1,130 +1,178 @@
-# Turismo-Capilla-Backend
-# Backend | Turismo Capilla del Monte
+# Turismo Capilla del Monte — Backend API
 
 <p align="center">
   <img src="https://img.shields.io/badge/Proyecto-Turismo%20Capilla%20del%20Monte-2ea44f?style=for-the-badge" alt="Proyecto">
   <img src="https://img.shields.io/badge/Componente-API%20%26%20Backend-blue?style=for-the-badge" alt="Backend">
-  <img src="https://img.shields.io/badge/Estado-En%20desarrollo-yellow?style=for-the-badge" alt="Estado">
+  <img src="https://img.shields.io/badge/Framework-NestJS%2012-ea2845?style=for-the-badge" alt="NestJS">
+  <img src="https://img.shields.io/badge/ORM-Prisma%206-2d3748?style=for-the-badge" alt="Prisma">
+  <img src="https://img.shields.io/badge/Base%20de%20Datos-PostgreSQL-336791?style=for-the-badge" alt="PostgreSQL">
 </p>
 
 <p align="center">
-  <strong>Servicios backend y API REST para centralizar, gestionar y proveer la información turística de Capilla del Monte.</strong>
+  <strong>Servicios backend y API REST transaccional para centralizar, gestionar y proveer la información turística y motor de reservas de Capilla del Monte, Córdoba.</strong>
 </p>
 
 ---
 
-## Sobre el proyecto
+## 1. Sobre el Proyecto
 
-Este repositorio contiene la arquitectura, servicios y APIs del proyecto **Turismo Capilla del Monte**. 
+Este repositorio contiene la arquitectura, servicios de dominio y API REST del proyecto **Turismo Capilla del Monte**. 
 
-Su propósito es proporcionar una capa de servidor robusta y escalable encargada de la lógica de negocio, persistencia de datos y exposición de endpoints seguros para que las aplicaciones cliente (frontend web y futuros servicios móviles) puedan consultar y gestionar los datos turísticos de la localidad.
-
-El backend se encuentra actualmente en una etapa inicial de análisis y diseño de arquitectura.
-
----
-
-## Problema
-
-La información turística suele requerir actualización dinámica, validaciones y una estructura de datos normalizada para evitar inconsistencias y dispersión.
-
-Este servicio backend resuelve la necesidad de:
-* **Centralizar la fuente de datos:** Unificar la información de atractivos, actividades y servicios turísticos en un único modelo de datos accesible vía API.
-* **Desacoplar la lógica:** Permitir que el frontend consuma datos estructurados y confiables sin acoplarse a la persistencia.
+Provee una capa de servidor robusta y escalable bajo **Screaming Architecture (Hexagonal / Puertos y Adaptadores)** encargada de:
+* **Autenticación e Identidad:** JWT y control de acceso basado en roles (`ADMIN`, `HOST`, `TOURIST`).
+* **Sistema de Invitaciones Seguras:** Tokens criptográficos emitidos por la Comisión de Turismo para la adhesión formal de prestadores.
+* **Catálogos Turísticos:** ABM y consulta pública de paseos, cerros y atractivos naturales.
+* **Gestión de Alojamientos:** Inventario de cabañas, amenidades y galerías multimedia.
+* **Motor Transaccional de Reservas:** Creación atómica con validación estricta anti-overbooking (`checkIn < requested.checkOut && checkOut > requested.checkIn`).
 
 ---
 
-## Objetivo
+## 2. Equipo de Desarrollo
 
-Desarrollar una API REST y servicios auxiliares eficientes, seguros y documentados que permitan **gestionar, almacenar y servir los recursos turísticos** de la plataforma web.
-
-### Objetivos específicos
-
-* Diseñar el modelo de datos relacional/no relacional para los recursos turísticos.
-* Implementar endpoints CRUD para atractivos, actividades, categorías y puntos de interés.
-* Diseñar mecanismos de validación, manejo de errores y respuestas estandarizadas (JSON).
-* Configurar entornos de desarrollo, pruebas y despliegue (variables de entorno, CORS, seguridad básica).
-* Documentar los endpoints (Swagger / OpenAPI / Postman).
+| Integrante | Rol |
+| :--- | :--- |
+| **Martino Costigliolo** | Arquitectura & Backend / Frontend |
+| **Tiago Nicolitsis** | Desarrollo |
+| **Juan Larcher** | Desarrollo |
 
 ---
 
-## Alcance inicial del Backend
+## 3. Requisitos Previos
 
-La primera versión contempla la implementación de servicios para:
-
-* **Atractivos turísticos:** Endpoints para listado, detalle, filtrado por categorías y ubicación.
-* **Actividades y eventos:** Gestión de fechas, descripciones y tipos de experiencia.
-* **Información general y contacto:** Proveedores de datos institucionales y de emergencias.
-* **Gestión de multimedia:** Enlaces y metadatos asociados a imágenes y recursos visuales.
-* **Consumo seguro:** Configuración de CORS y políticas de acceso para el cliente web.
+* **Node.js:** v20.x o v22.x LTS
+* **pnpm:** v9.x o v11.x
+* **PostgreSQL:** v15+ corriendo localmente o mediante Docker
 
 ---
 
-## Tecnologías
+## 4. Configuración de Variables de Entorno
 
-El stack definitivo está en proceso de definición.
+Crear un archivo `.env` en la raíz del proyecto a partir de la plantilla:
 
-Se están evaluando tecnologías para el servidor (Node.js/Express, Python/FastAPI, Java/Spring Boot u otros) y motores de base de datos (PostgreSQL, MySQL o MongoDB) según las necesidades de rendimiento y modelado del proyecto.
+```bash
+cp .env.example .env
+```
 
-> **Nota:** esta sección se actualizará con los requisitos de entorno (versión de runtime, dependencias, variables `.env`) una vez fijado el stack.
+Contenido base de `.env`:
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/turismo_capilla?schema=public"
+JWT_SECRET="super-secret-key-capilla-monte-2026-production"
+JWT_EXPIRES_IN="7d"
+PORT=3001
+```
 
----
-
-## Equipo
-
-Proyecto desarrollado por:
-
-| Integrante               |
-| ----------------------- |
-| **Tiago Nicolitsis**    |
-| **Martino Costigliolo** |
-| **Juan Larcher**        |
+> **Nota:** El backend corre por defecto en el puerto **3001** para no colisionar con aplicaciones cliente en el puerto 3000 o 4321.
 
 ---
 
-## Etapas de desarrollo (Backend)
+## 5. Instalación y Base de Datos
 
-### 1. Análisis y modelado
-Definición de entidades, diagramas entidad-relación (ER) y contratos de API.
+```bash
+# 1. Instalar dependencias
+pnpm install
 
-### 2. Configuración de arquitectura
-Estructuración del proyecto (patrón MVC / multicapa), configuración de base de datos y middleware base.
+# 2. Generar el cliente de Prisma
+pnpm run prisma:generate
 
-### 3. Implementación de endpoints
-Desarrollo de controladores, lógica de negocio y persistencia de datos.
+# 3. Aplicar las migraciones a PostgreSQL
+pnpm run prisma:migrate
 
-### 4. Pruebas y optimización
-Pruebas de endpoints (unitarias/integración), validación de carga y optimización de consultas.
+# 4. Poblar la base de datos con datos semilla iniciales
+pnpm run prisma:seed
+```
 
-### 5. Documentación y despliegue
-Generación de documentación interactiva de la API y despliegue del servicio en entorno cloud/servidor.
-
----
-
-## Entregables
-
-* Esquema y scripts de base de datos.
-* API REST funcional con endpoints documentados.
-* Colección de pruebas de endpoints (Postman / Swagger).
-* Servidor desplegado en entorno de pruebas/producción.
-* Documentación de configuración local y variables de entorno.
-
----
-
-## Estado del proyecto
-
-**Actualmente: En etapa de inicio, análisis de requerimientos y modelado de datos.**
+### Datos Semilla Iniciales (Seed)
+Al ejecutar `pnpm run prisma:seed` se configuran automáticamente:
+* **Administrador Oficial de la Comisión:**
+  * **Email:** `admin@capilladelmonte.gov.ar`
+  * **Contraseña:** `AdminCapilla2026!`
+  * **Rol:** `ADMIN`
+* **Atractivos Turísticos Iniciales:**
+  * Cerro Uritorco (Ascenso diurno/nocturno, 1979 msnm)
+  * Los Terrones (Parque autóctono y circuito geológico)
+  * El Zapato (Monumento natural de roca)
+  * Balneario La Toma (Río Calabalumba)
 
 ---
 
-## 📚 Documentación y Recursos
+## 6. Ejecución del Servidor
 
-- **Wiki del repositorio:** Detalla los aspectos del marco PMI, arquitectura de backend, actas y planificación técnica.
-- **Google Drive:** Almacena la documentación general del proyecto.  
-  [Acceder a la carpeta del proyecto en Google Drive](https://drive.google.com/drive/u/1/folders/1KQLWydgsWH7hCD0RqfqIrFO5AzJRqB5E)
+```bash
+# Modo desarrollo con recarga en vivo (hot-reload)
+pnpm run dev
+
+# Compilar el proyecto para producción
+pnpm run build
+
+# Iniciar el servidor compilado en producción
+pnpm run start:prod
+```
+
+### URLs del Servicio
+* **API REST Base:** [http://localhost:3001/api/v1](http://localhost:3001/api/v1)
+* **Documentación Interactiva (Swagger UI):** [http://localhost:3001/api](http://localhost:3001/api)
+* **Healthcheck:** [http://localhost:3001/api/v1/health](http://localhost:3001/api/v1/health)
 
 ---
 
-<p align="center">
-  <strong>Turismo Capilla del Monte - Backend API</strong><br>
-  Capa de servicios y persistencia de datos.
-</p>
+## 7. Inspección Visual de Datos (Prisma Studio)
+
+Para explorar, filtrar y editar registros en una interfaz gráfica:
+
+```bash
+pnpm run prisma:studio
+```
+Disponible en [http://localhost:5555](http://localhost:5555).
+
+---
+
+## 8. Calidad de Código y Pruebas
+
+```bash
+# Ejecutar suite completa de pruebas unitarias (33 tests)
+pnpm run test
+
+# Modo interactivo / observador (watch)
+pnpm run test:watch
+
+# Ejecutar el linter estricto (Oxlint)
+pnpm run lint
+
+# Formatear el código con Prettier
+pnpm run format
+```
+
+---
+
+## 9. Estructura del Repositorio
+
+```text
+/
+├── docs/                          # Documentación técnica de arquitectura y endpoints
+│   ├── api-reference.md           # Catálogo exhaustivo de endpoints (24 rutas)
+│   ├── endpoints.md               # Mapeo de endpoints a Historias de Usuario
+│   ├── database-and-domain-model.md # DER, UML de dominio y reglas de overbooking
+│   ├── diagrams/                  # Diagramas editables en Excalidraw
+│   └── manual-testing/            # Guías paso a paso de pruebas funcionales
+├── prisma/
+│   ├── schema.prisma              # Definición de entidades, índices y relaciones
+│   ├── migrations/                # Historial de migraciones versionadas
+│   └── seed.ts                    # Población inicial de base de datos
+├── src/
+│   ├── common/                    # Infraestructura transversal (guards, filters, decorators)
+│   ├── modules/                   # Dominios de negocio (auth, invitations, users, accommodations, bookings, attractions, health)
+│   ├── prisma/                    # Servicio global de base de datos
+│   ├── app.module.ts              # Módulo raíz de NestJS
+│   └── main.ts                    # Bootstrap, CORS, ValidationPipe y Swagger
+├── test/                          # Pruebas End-to-End
+├── package.json
+└── tsconfig.json
+```
+
+---
+
+## 10. Documentación de Referencia
+
+* 📖 [**Referencia Oficial de Endpoints de la API**](docs/api-reference.md)
+* 🗄️ [**Modelo de Datos (DER/UML) y Reglas de Negocio**](docs/database-and-domain-model.md)
+* 🧪 [**Guías de Pruebas Manuales por Módulo**](docs/manual-testing-guide.md)
