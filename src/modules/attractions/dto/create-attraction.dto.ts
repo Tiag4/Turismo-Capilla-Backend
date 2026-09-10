@@ -11,29 +11,12 @@ import {
   MaxLength,
   ValidateNested,
   IsArray,
-  IsUrl,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AttractionCategory } from '@prisma/client';
+import { AddAttractionImageDto } from './add-attraction-image.dto.js';
 
-export class AttractionImageDto {
-  @ApiProperty({
-    example: 'https://res.cloudinary.com/turismo-capilla/image/upload/v1/uritorco.jpg',
-    description: 'URL de la fotografía en almacenamiento en la nube',
-  })
-  @IsString()
-  @IsUrl()
-  @IsNotEmpty()
-  url!: string;
-
-  @ApiProperty({
-    example: 'attractions/uritorco_01',
-    description: 'Identificador público del archivo (ej. Cloudinary publicId)',
-  })
-  @IsString()
-  @IsNotEmpty()
-  publicId!: string;
-}
+export { AddAttractionImageDto as AttractionImageDto };
 
 export class CreateAttractionDto {
   @ApiProperty({
@@ -128,12 +111,12 @@ export class CreateAttractionDto {
   longitude?: number;
 
   @ApiPropertyOptional({
-    type: [AttractionImageDto],
+    type: [AddAttractionImageDto],
     description: 'Galería inicial de imágenes del atractivo',
   })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => AttractionImageDto)
-  images?: AttractionImageDto[];
+  @Type(() => AddAttractionImageDto)
+  images?: AddAttractionImageDto[];
 }

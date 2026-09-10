@@ -8,9 +8,6 @@ import { AccommodationsModule } from './modules/accommodations/accommodations.mo
 import { BookingsModule } from './modules/bookings/bookings.module.js';
 import { HealthModule } from './modules/health/health.module.js';
 import { UsersModule } from './modules/users/users.module.js';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
-
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -23,7 +20,7 @@ import { AppService } from './app.service.js';
     HealthModule,
     UsersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

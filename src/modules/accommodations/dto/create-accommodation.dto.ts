@@ -4,45 +4,18 @@ import {
   IsNotEmpty,
   IsEnum,
   IsOptional,
-  IsBoolean,
   IsNumber,
   Min,
   Max,
   MaxLength,
   IsArray,
-  IsUrl,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { AccommodationType } from '@prisma/client';
+import { AddAccommodationImageDto } from './add-accommodation-image.dto.js';
 
-export class AccommodationImageInputDto {
-  @ApiProperty({
-    example: 'https://res.cloudinary.com/turismo-capilla/image/upload/v1/cabana-los-nogales.jpg',
-    description: 'URL de la imagen del alojamiento',
-  })
-  @IsString()
-  @IsUrl()
-  @IsNotEmpty()
-  url!: string;
-
-  @ApiProperty({
-    example: 'accommodations/cabana_01',
-    description: 'Identificador público del archivo (ej. Cloudinary publicId)',
-  })
-  @IsString()
-  @IsNotEmpty()
-  publicId!: string;
-
-  @ApiPropertyOptional({
-    example: true,
-    description: 'Indica si es la imagen de portada principal',
-    default: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  isMain?: boolean;
-}
+export { AddAccommodationImageDto as AccommodationImageInputDto };
 
 export class CreateAccommodationDto {
   @ApiProperty({
@@ -139,12 +112,12 @@ export class CreateAccommodationDto {
   amenities?: string[];
 
   @ApiPropertyOptional({
-    type: [AccommodationImageInputDto],
+    type: [AddAccommodationImageDto],
     description: 'Galería inicial de fotos del alojamiento',
   })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => AccommodationImageInputDto)
-  images?: AccommodationImageInputDto[];
+  @Type(() => AddAccommodationImageDto)
+  images?: AddAccommodationImageDto[];
 }
