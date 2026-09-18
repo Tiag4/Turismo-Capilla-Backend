@@ -1,0 +1,24 @@
+databases:
+  - name: turismo-capilla-db
+    databaseName: turismo_capilla
+    user: turismo_user
+    plan: free
+
+services:
+  - type: web
+    name: turismo-capilla-backend
+    runtime: node
+    plan: free
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && npx prisma generate && npx nest build
+    startCommand: npx prisma migrate deploy && npx tsx prisma/seed.ts && node dist/main.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: turismo-capilla-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: NODE_ENV
+        value: production
