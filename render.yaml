@@ -9,7 +9,7 @@ services:
     name: turismo-capilla-backend
     runtime: node
     plan: free
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && npx prisma generate && npx nest build
+    buildCommand: npx pnpm install --prod=false && npx prisma generate && npx nest build
     startCommand: npx prisma migrate deploy && npx tsx prisma/seed.ts && node dist/main.js
     envVars:
       - key: DATABASE_URL
